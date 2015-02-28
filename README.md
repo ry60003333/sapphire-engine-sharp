@@ -38,6 +38,6 @@ Compile the project within MonoDevelop or Visual Studio.
 
 Install Instructions
 ----------------
-Coming soon!
+To install MonoDevelop on Linux, follow the instructions at http://www.monodevelop.com/download/linux/.
 
 [1]:https://github.com/ry60003333/sapphire-engine
