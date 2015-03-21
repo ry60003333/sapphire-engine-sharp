@@ -21,8 +21,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections;
 
-using UnityEngine;
-
 namespace AllGoFree.SapphireEngine.Client
 {
 	/// <summary>
@@ -151,7 +149,7 @@ namespace AllGoFree.SapphireEngine.Client
 				Packet next = (Packet)readQueue.Dequeue();
 				packetReader.Handle(next, this);
 
-				Debug.Log("Handled packet ID " + next.GetId() + " of size " + next.GetBuffer().Length + " on game thread.");
+				//Debug.Log("Handled packet ID " + next.GetId() + " of size " + next.GetBuffer().Length + " on game thread.");
 			}
 		}
 
@@ -166,11 +164,19 @@ namespace AllGoFree.SapphireEngine.Client
 			// Check how many bytes were actually read
 			int count = remote.EndReceive(result);
 
+			// Debugging
+			//Debug.Log("Received " + count + " bytes from server.");
+
 			// Update the buffer offset to account for the amount of data read in
 			readBuffer.Seek(readBuffer.GetOffset() + count);
 
+			// TODO: If the while below is an if statement (as it was before)
+			// and more then one packet arrives, the Stream appears to lock up.
+			// The while loop is a workaround for now, but this needs to be
+			// fixed.
+
 			// A packet requires a minimum of 3 bytes for the header
-			if (readBuffer.GetOffset() >= 3)
+			while (readBuffer.GetOffset() >= 3)
 			{
 
 				// Save the current write offset of the buffer
@@ -229,6 +235,15 @@ namespace AllGoFree.SapphireEngine.Client
 						packetReader.Handle(packet, this);
 					}
 				}
+				else
+				{
+					// Otherwise, break out of the loop
+
+					// Debugging
+					// Debug.Log("Waiting for packet " + id + " of size " + size + ".");
+
+					break;
+				}
 
 				// Go back to the write offset
 				readBuffer.Seek(writeOffset);
@@ -285,7 +300,7 @@ namespace AllGoFree.SapphireEngine.Client
 				writeBuffer.WriteByte(packet.GetId());
 				writeBuffer.WriteWord(packet.GetBuffer().Length);
 
-				Debug.Log("Writing packet ID " + packet.GetId() + " of size " + packet.GetBuffer().Length + " to server.");
+				//Debug.Log("Writing packet ID " + packet.GetId() + " of size " + packet.GetBuffer().Length + " to server.");
 
 				// Write the payload
 				Array.Copy(packet.GetBuffer(), 0, writeBuffer.GetBuffer(), writeBuffer.GetOffset(), packet.GetBuffer().Length);

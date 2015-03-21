@@ -292,6 +292,35 @@ namespace AllGoFree.SapphireEngine.Client
 		}
 
 		/// <summary>
+		/// Read a long.
+		/// </summary>
+		/// <returns>The value.</returns>
+		public long ReadLong()
+		{
+			long l = (long)ReadDWord() & 0xffffffffL;
+			long l1 = (long)ReadDWord() & 0xffffffffL;
+			return (l << 32) + l1;
+		}
+
+		/// <summary>
+		/// Write a long.
+		/// </summary>
+		/// <param name="l">The long.</param>
+		/// <returns>The packet.</returns>
+		public Packet WriteLong(long l)
+		{
+			WriteByte((byte)(int)(l >> 56));
+			WriteByte((byte)(int)(l >> 48));
+			WriteByte((byte)(int)(l >> 40));
+			WriteByte((byte)(int)(l >> 32));
+			WriteByte((byte)(int)(l >> 24));
+			WriteByte((byte)(int)(l >> 16));
+			WriteByte((byte)(int)(l >> 8));
+			WriteByte((byte)(int)l);
+			return this;
+		}
+
+		/// <summary>
 		/// Finalizes the packet.
 		/// </summary>
 		public void FinalizePacket()
